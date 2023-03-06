@@ -116,6 +116,11 @@ extension LocalhostServer: LocalhostRouter {
     public func stopListening() {
         self.server.stopListening()
     }
+    
+    public func clearStubs() {
+        overlayingRoutes.removeAll()
+        recordedRequests.removeAll()
+    }
 }
 
 public class LocalhostServer {
