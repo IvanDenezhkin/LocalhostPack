@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/thecatalinstan/Criollo",
       "state" : {
-        "branch" : "master",
-        "revision" : "d0aa6ee6fcd48c436f92e9d8e09813db4765c9d8"
+        "revision" : "87c6d2fa753e1be3c8d1031a60129f652240ec1e",
+        "version" : "1.1.0"
       }
     }
   ],

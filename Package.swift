@@ -15,7 +15,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/thecatalinstan/Criollo", branch: "master"),
+        .package(url: "https://github.com/thecatalinstan/Criollo", exact: "1.1.0")
     ],
     targets: [
         .target(
