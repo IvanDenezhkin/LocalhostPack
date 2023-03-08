@@ -12,10 +12,10 @@
     {
       "identity" : "criollo",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/thecatalinstan/Criollo",
+      "location" : "https://github.com/IvanDenezhkin/Criollo.git",
       "state" : {
-        "revision" : "87c6d2fa753e1be3c8d1031a60129f652240ec1e",
-        "version" : "1.1.0"
+        "branch" : "master",
+        "revision" : "af91555505f284c6a048d2db807a22630bfdac0f"
       }
     }
   ],
