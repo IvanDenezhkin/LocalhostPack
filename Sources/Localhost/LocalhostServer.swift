@@ -8,6 +8,7 @@
 
 import Foundation
 import Criollo
+import NQueue
 
 extension LocalhostServer: LocalhostRouter {
     
@@ -118,8 +119,10 @@ extension LocalhostServer: LocalhostRouter {
     }
     
     public func clearStubs() {
-        overlayingRoutes.removeAll()
-        recordedRequests.removeAll()
+        mutex.sync {
+            overlayingRoutes.removeAll()
+            recordedRequests.removeAll()
+        }
     }
 }
 
@@ -128,17 +131,17 @@ public class LocalhostServer {
     public let portNumber: UInt
     let server: CRHTTPServer
     
+    private let mutex: Mutexing = Mutex.pthread(.recursive)
     var overlayingRoutes: [LocalhostServerMethodPath: [LocalhostServerRoute]]
-    
     public var recordedRequests: [URLRequest]
     
     public required init(portNumber: UInt){
         server = CRHTTPServer()
         self.portNumber = portNumber
-        recordedRequests = [URLRequest]()
-        overlayingRoutes = [LocalhostServerMethodPath: [LocalhostServerRoute]]()
+        recordedRequests = []
+        overlayingRoutes = [:]
     }
-    
+
     public static func initializeUsingRandomPortNumber() -> LocalhostServer{
         let availablePort: UInt = UInt(LocalhostPort.availablePortNumber())
         return LocalhostServer(portNumber: availablePort)
@@ -153,7 +156,9 @@ public class LocalhostServer {
         if let body = crRequest.bodyFromData() {
             request.httpBody = body
         }
-        self.recordedRequests.append(request)
+        mutex.sync {
+            self.recordedRequests.append(request)
+        }
         guard let response = routeBlock(request) else {
             crResponse.setStatusCode(200, description: nil)
             return
@@ -292,34 +297,37 @@ extension LocalhostServer {
     func setOverlayingRoute(method: String,
                             path: String,
                             routeBlock: @escaping ((URLRequest) -> LocalhostServerResponse?)) {
-        
-        let localhostServerMethodPath = LocalhostServerMethodPath(method: method, path: path)
-        let newServerRoute = LocalhostServerRoute(pathMethod: localhostServerMethodPath, routeBlock: routeBlock)
-        let methodPathKeys = Array(self.overlayingRoutes.keys)
-        if methodPathKeys.contains(localhostServerMethodPath), var existingRoutes = self.overlayingRoutes[localhostServerMethodPath] {
-            existingRoutes.append(newServerRoute)
-            self.overlayingRoutes[localhostServerMethodPath] = existingRoutes
-        } else {
-            let routes: [LocalhostServerRoute] = [
-                newServerRoute
-            ]
-            self.overlayingRoutes[localhostServerMethodPath] = routes
+        mutex.sync {
+            let localhostServerMethodPath = LocalhostServerMethodPath(method: method, path: path)
+            let newServerRoute = LocalhostServerRoute(pathMethod: localhostServerMethodPath, routeBlock: routeBlock)
+            let methodPathKeys = Array(self.overlayingRoutes.keys)
+            if methodPathKeys.contains(localhostServerMethodPath), var existingRoutes = self.overlayingRoutes[localhostServerMethodPath] {
+                existingRoutes.append(newServerRoute)
+                self.overlayingRoutes[localhostServerMethodPath] = existingRoutes
+            } else {
+                let routes: [LocalhostServerRoute] = [
+                    newServerRoute
+                ]
+                self.overlayingRoutes[localhostServerMethodPath] = routes
+            }
         }
     }
     
     func popOverlayingRoute(method: String, path: String) -> ((URLRequest) -> LocalhostServerResponse?)? {
-        let localhostServerMethodPath = LocalhostServerMethodPath(method: method, path: path)
-        let methodPathKeys = Array(self.overlayingRoutes.keys)
-        guard methodPathKeys.contains(localhostServerMethodPath),
-            var existingRoutes = self.overlayingRoutes[localhostServerMethodPath],
-            existingRoutes.count > 0  else {
+        mutex.sync {
+            let localhostServerMethodPath = LocalhostServerMethodPath(method: method, path: path)
+            let methodPathKeys = Array(self.overlayingRoutes.keys)
+            guard methodPathKeys.contains(localhostServerMethodPath),
+                  var existingRoutes = self.overlayingRoutes[localhostServerMethodPath],
+                  existingRoutes.count > 0  else {
                 return nil
+            }
+            if existingRoutes.count == 1 {
+                return existingRoutes.first?.routeBlock
+            }
+            let firstItem = existingRoutes.removeFirst()
+            self.overlayingRoutes[localhostServerMethodPath] = existingRoutes
+            return firstItem.routeBlock
         }
-        if existingRoutes.count == 1 {
-            return existingRoutes.first?.routeBlock
-        }
-        let firstItem = existingRoutes.removeFirst()
-        self.overlayingRoutes[localhostServerMethodPath] = existingRoutes
-        return firstItem.routeBlock
     }
 }
