@@ -11,7 +11,7 @@ Once you have your Swift package set up, adding Alamofire as a dependency is as 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/IvanDenezhkin/SwiftLocalhost", branch: "master")
+    .package(url: "https://github.com/IvanDenezhkin/LocalhostPack.git", branch: "master")
 ]
 ```
 

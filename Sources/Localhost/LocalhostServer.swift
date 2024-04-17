@@ -8,7 +8,7 @@
 
 import Foundation
 import Criollo
-import NQueue
+import Threading
 
 extension LocalhostServer: LocalhostRouter {
     
