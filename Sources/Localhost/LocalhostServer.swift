@@ -131,7 +131,7 @@ public class LocalhostServer {
     public let portNumber: UInt
     let server: CRHTTPServer
     
-    private let mutex: Mutexing = Mutex.pthread(.recursive)
+    private let mutex: Mutexing = AnyMutex.pthread(.recursive)
     var overlayingRoutes: [LocalhostServerMethodPath: [LocalhostServerRoute]]
     public var recordedRequests: [URLRequest]
     

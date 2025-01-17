@@ -15,7 +15,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/NikSativa/Threading.git", from: "1.3.5"),
+        .package(url: "https://github.com/NikSativa/Threading.git", from: "2.1.0"),
         .package(url: "https://github.com/IvanDenezhkin/Criollo.git", branch: "master")
     ],
     targets: [
