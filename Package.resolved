@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/NikSativa/Threading.git",
       "state" : {
-        "revision" : "10d8b0ab4d96adc2519d9435f8c046b80ee36008",
-        "version" : "2.1.0"
+        "revision" : "32b7d1ecc49299e900494495f9065cb74527a1d8",
+        "version" : "2.2.0"
       }
     }
   ],
