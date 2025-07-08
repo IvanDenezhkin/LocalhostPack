@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.10
 import PackageDescription
 
 let package = Package(
@@ -15,7 +15,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/NikSativa/Threading.git", from: "2.1.0"),
+        .package(url: "https://github.com/NikSativa/Threading.git", from: "2.2.0"),
         .package(url: "https://github.com/IvanDenezhkin/Criollo.git", branch: "master")
     ],
     targets: [

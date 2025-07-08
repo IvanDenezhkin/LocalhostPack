@@ -131,7 +131,7 @@ public class LocalhostServer {
     public let portNumber: UInt
     let server: CRHTTPServer
     
-    private let mutex: Mutexing = AnyMutex.pthread(.recursive)
+    private let mutex: Locking = AnyLock.default
     var overlayingRoutes: [LocalhostServerMethodPath: [LocalhostServerRoute]]
     public var recordedRequests: [URLRequest]
     
@@ -156,7 +156,7 @@ public class LocalhostServer {
         if let body = crRequest.bodyFromData() {
             request.httpBody = body
         }
-        mutex.sync {
+        mutex.sync { [request] in
             self.recordedRequests.append(request)
         }
         guard let response = routeBlock(request) else {
